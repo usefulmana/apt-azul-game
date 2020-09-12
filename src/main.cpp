@@ -17,6 +17,7 @@ void loadGame();
 
 std::vector<Player *> createPlayersFromUserInput();
 
+
 bool isNameValid(const std::string &name);
 
 void engageTestMode(char* fileName);
@@ -214,18 +215,28 @@ void engageTestMode(char* fileName){
 
         std::ifstream loadFile;
         loadFile.open (fileName, std::ifstream::in);
-          
-        int newCount = 1;
+        Game *testGame = new Game();
+
+        int newCount = 0;
+        std::string tiles;
         std::string name;
         std::vector<Player *> players;
             
             //Create 2 Players from first 2 lines of save file
             do{
+                getline(loadFile, tiles);
+                testGame -> setTileBagFromString(tiles);
+                std::cout << "Tile Bag:  " << tiles << std::endl;
+                newCount++;
+            } while (newCount < 1);
+
+            do{
                 getline(loadFile, name);
                 players.push_back(new Player(name));
                 std::cout << "Player " << newCount << " Name: " << name << std::endl;
                 newCount++;
-            } while (newCount < 3);
+            } while (newCount >= 1 && newCount < 3);
+
 
         loadFile.close();
 }
