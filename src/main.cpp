@@ -7,6 +7,8 @@
 #include "Player.h"
 #include "utils.h"
 
+#define MAX_GAME_ROUNDS 2
+
 [[noreturn]] void showMenu();
 
 void showCredits();
@@ -211,35 +213,82 @@ std::vector<Player *> createPlayersFromUserInput() {
 }
 
 void engageTestMode(char* fileName){
-    //std::cout << "Engaged Test Mode" << std::endl;
 
-        std::ifstream loadFile;
-        loadFile.open (fileName, std::ifstream::in);
-        Game *testGame = new Game();
-
-        int newCount = 0;
-        std::string tiles;
-        std::string name;
-        std::vector<Player *> players;
+    //Initialise Test Mode Variables
+    std::ifstream loadFile;
+    loadFile.open (fileName, std::ifstream::in);
+    Game *testGame = new Game();
+    int newCount = 0;
+    std::string tiles;
+    std::string name;
+    std::vector<Player *> players;
+    std::vector<std::string> savedInputs;
             
-            //Create 2 Players from first 2 lines of save file
-            do{
-                getline(loadFile, tiles);
-                testGame -> setTileBagFromString(tiles);
-                std::cout << "Tile Bag:  " << tiles  << "\n" << std::endl;
-                newCount++;
-            } while (newCount < 1);
+    //Create Tile Bag from first line of test files
+    do{
+        getline(loadFile, tiles);
+        testGame -> setTileBagFromString(tiles);
+        testGame -> addFirstTileToCenter(); 
+        testGame-> fillFactories();
+        std::cout << "Tile Bag:  " << tiles  << "\n" << std::endl;
+        newCount++;
+    } while (newCount < 1);
 
-            do{
+    //Create 2 Players from next 2 lines of save file
+    do{
+        getline(loadFile, name);
+        players.push_back(new Player(name));
+        testGame->addPlayers(players);
+        std::cout << "Player " << newCount << " Name: " << name << "\n"<< std::endl;
+        newCount++;
+    } while (newCount >= 1 && newCount < 3);
+
+    //Counter to keep track
+    int round = 1;
+
+    // While game hasn't finished last round
+    while (round <= MAX_GAME_ROUNDS){
+        
+        //Implement Test Version of Game
+        for (auto &player: players) {
+            bool validInput = false;
+
+            while (!validInput && newCount >= 3) {
                 getline(loadFile, name);
-                players.push_back(new Player(name));
-                testGame->addPlayers(players);
-                std::cout << "Player " << newCount << " Name: " << name << "\n"<< std::endl;
-                newCount++;
-            } while (newCount >= 1 && newCount < 3);
 
-            testGame->play();
+                // Check EOF Character (^D) 
+                if (std::cin.eof()){
+                    quitGame();
+                }
 
+                // Check for errors
+                std::vector<std::string> errors = checkInput(name);
 
-        loadFile.close();
+                // Check if there is any error
+                if (errors.capacity() == 0) {
+
+                    // Returns substring of first 4 characters in input
+                    if (name.substr(0, 4) == "turn"){
+                            // TODO execute the command
+                            
+                            // Add input to input vector
+                        savedInputs.push_back(name);
+                        // std::cout << "Turn successful." << std::endl;
+                            std::cout << "Factories:" << std::endl;
+                            testGame -> printFactories();
+                            std::cout << std::endl;
+                            std::cout << "Mosaic for " << player->getName() << ":" << std::endl;
+                            player->printMosaic();
+                            player->printBrokenRow();
+                            std::cout << std::endl;
+
+                            // End input loop
+                            validInput = true;
+                    }
+                }
+            }
+        }
+        round++;
+    }
+    loadFile.close();
 }
