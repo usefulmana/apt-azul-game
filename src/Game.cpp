@@ -67,7 +67,7 @@ void Game::play() {
     // While game hasn't finished last round
     while (round <= MAX_GAME_ROUNDS) {
         std::cout << "=== Start Round " << round << " ===" << std::endl;
-
+        
         // For all players
         for (auto &player: players) {
             std::cout << "TURN FOR PLAYER: " << player->getName() << std::endl;

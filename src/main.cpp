@@ -226,16 +226,19 @@ void engageTestMode(char* fileName){
             do{
                 getline(loadFile, tiles);
                 testGame -> setTileBagFromString(tiles);
-                std::cout << "Tile Bag:  " << tiles << std::endl;
+                std::cout << "Tile Bag:  " << tiles  << "\n" << std::endl;
                 newCount++;
             } while (newCount < 1);
 
             do{
                 getline(loadFile, name);
                 players.push_back(new Player(name));
-                std::cout << "Player " << newCount << " Name: " << name << std::endl;
+                testGame->addPlayers(players);
+                std::cout << "Player " << newCount << " Name: " << name << "\n"<< std::endl;
                 newCount++;
             } while (newCount >= 1 && newCount < 3);
+
+            testGame->play();
 
 
         loadFile.close();
