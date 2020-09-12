@@ -210,5 +210,22 @@ std::vector<Player *> createPlayersFromUserInput() {
 }
 
 void engageTestMode(char* fileName){
-    std::cout << "Engaged Test Mode" << std::endl;
+    //std::cout << "Engaged Test Mode" << std::endl;
+
+        std::ifstream loadFile;
+        loadFile.open (fileName, std::ifstream::in);
+          
+        int newCount = 1;
+        std::string name;
+        std::vector<Player *> players;
+            
+            //Create 2 Players from first 2 lines of save file
+            do{
+                getline(loadFile, name);
+                players.push_back(new Player(name));
+                std::cout << "Player " << newCount << " Name: " << name << std::endl;
+                newCount++;
+            } while (newCount < 3);
+
+        loadFile.close();
 }
