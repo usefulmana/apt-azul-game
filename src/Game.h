@@ -69,6 +69,8 @@ public:
 
     bool isRowFull(int row, Player * player);
 
+    void playerTurn(Player* player);
+
 
 private:
     std::vector<Player*> players;

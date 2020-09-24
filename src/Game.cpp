@@ -1,6 +1,5 @@
 #include "Game.h"
 
-
 Game::Game() {
     // Declare factories
     factories = new Tile *[NUM_OF_FACTORIES];
@@ -45,20 +44,22 @@ void Game::save(const std::string &fileName, std::vector<std::string> vector) {
 
 void Game::play() {
 
-    //Add tile Bag to input vector
+    //FILL TILE BAG
     std::string bag;
     for (int i = 0; i < 101; ++i) {
         bag += tileBag->get(i)->getName();
     }
     savedInputs.push_back(bag);
 
-    // Add players' names to input vector
+    //ADD PLAYERS
     for (auto &player: players) {
         savedInputs.push_back(player->getName());
     }
 
-    // Add first tile to center and fill factories
+    //ADD FIRST TILE
     addFirstTileToCenter();
+
+    // ADD FACTORIES
     fillFactories();
 
     // Variable to store round
@@ -66,15 +67,23 @@ void Game::play() {
 
     // While game hasn't finished last round
     while (round <= MAX_GAME_ROUNDS) {
+
         std::cout << "=== Start Round " << round << " ===" << std::endl;
-//        std::cout << areFactoriesEmpty() << std::endl;
+
         // End round if center and factories r empty
         while (!isCenterEmpty() && !areFactoriesEmpty()){
+
             for (auto &player: players) {
+
+                //PRINT PLAYER NAME
                 std::cout << "TURN FOR PLAYER: " << player->getName() << std::endl;
+
+                //DISPLAY FACTORIES
                 std::cout << "Factories:" << std::endl;
                 printFactories();
                 std::cout << std::endl;
+
+                //DISPLAY MOSAIC
                 std::cout << "Mosaic for " << player->getName() << ":" << std::endl;
                 player->printMosaic();
                 player->printBrokenRow();
@@ -82,11 +91,11 @@ void Game::play() {
 
                 bool validInput = false;
 
-                // Instruction help
+                // INSTRUCTIONS
                 std::cout << "To Play: turn <factory> <color> <row>" << std::endl;
                 std::cout << "To Save: save <filename>" << std::endl;
 
-                // Exit if Valid Input Entered
+                //IF THE ENTERED INSTRUCTION IS VALID
                 while (!validInput) {
 
                     // Get user input
@@ -107,10 +116,11 @@ void Game::play() {
                     std::vector<std::string> errors = checkInput(input, player);
 
                     // Check if there is any error
-                    if (errors.capacity() == 0) {
+                  //  if (errors.capacity() == 0) {
 
                         // Returns substring of first 4 characters in input
                         if (input.substr(0, 4) == "turn"){
+
                             execute(input, player);
                             // Add input to input vector
                             savedInputs.push_back(input);
@@ -137,7 +147,7 @@ void Game::play() {
                             std::cout << "Saved to " << fileName << std::endl;
                         }
 
-                    } else {
+                     else {
 
                         // Notify users of errors
                         std::cout << "Invalid Input!" << std::endl;
@@ -288,10 +298,40 @@ bool Game::areFactoriesEmpty() {
 
 void Game::execute(const std::string &command, Player * player) {
     // TODO implement execute the command
+     
     std::vector<std::string> commands = splitString(command, ' ');
     int factory = std::stoi(commands[1]);
     std::string color = commands[2];
     int targetRow = std::stoi(commands[3]);
+
+    //BREAKING A TILE FUNCTIONALITY? APPARENTLY YOU CAN BREAK A TILE ON PURPOSE AND DRAG IT TO BOTTOM ROW
+    //IF SO, INCLUDE BREAKACTION = 'B' (IF WE IMPLEMENT THIS) IN THIS LOOP
+    bool gone = false;
+
+     if (factory == 0){
+        for (size_t i = 0; i < center.size(); ++i){
+            //CHECKING WHETHER FIRST PLAYER TILE HAS BEEN TAKEN
+            if (!isCenterEmpty()){
+                if(center[i]->getName() == 'F'){
+                    for(int j = 0; j < BROKEN_ROW_SIZE; j++){
+                        if(player->getBrokenRow() == nullptr || !gone){
+                            // INSERT FIRST PLAYER TOKEN INTO FLOOR LINE
+                            player->addToBrokenRow('F');
+
+                            // DISPLAY FIRST PLAYER TOKEN HAS BEEN TAKEN
+                            std::cout << "FIRST PLAYER TOKEN" << std::endl;
+                                        
+                            // DELETE TILE FROM CENTRE FACTORY
+                            center[0] = nullptr;
+                            gone = true;
+                        }
+                    }
+                }
+            }           
+        }
+    }
+
+    gone = false;
 
     // Draw from factory
 

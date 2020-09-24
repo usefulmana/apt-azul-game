@@ -19,3 +19,7 @@ void Tile::setName(const char &n) {
     this->name = n;
 }
 
+char Tile::getTile(){
+    return tile;
+}
+

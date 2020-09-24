@@ -34,7 +34,11 @@ public:
 
     void addToBrokenRow(Tile tile);
 
+    void createPlayers();
+
     Tile ** getUnlaidRow();
+
+    Tile* getBrokenRow();
 
     Tile ** getGrid();
 
